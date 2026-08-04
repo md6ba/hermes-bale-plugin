@@ -106,3 +106,14 @@ You should see the platform register and the bot poll `tapi.bale.ai`.
 | `plugin.yaml`| Plugin manifest (name, env requirements, metadata)     |
 | `__init__.py`| Exposes `register` (the plugin entry point)            |
 | `adapter.py` | `BaleAdapter(TelegramAdapter)` — the actual adapter    |
+
+## Support / Donate
+
+If this plugin helps you, support its maintenance:
+
+- **Crypto (EVM / Ethereum):** `0x839eF34EB4CA948748A4a4180B39d6323e0E97a8`
+- **Buy me a coffee:** https://buymeacoffee.com/md6ba
+
+## License
+
+MIT — free to use, modify, and redistribute.
