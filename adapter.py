@@ -98,6 +98,37 @@ class BaleAdapter(TelegramAdapter):
         raw = _bale_allowed_users()
         return {u.strip() for u in raw.split(",") if u.strip()}
 
+    async def _build_ptb_requests(self) -> tuple:
+        """Bale transport: ALWAYS direct — never TELEGRAM_PROXY, never fallback IPs.
+
+        The Telegram parent resolves ``TELEGRAM_PROXY`` (and, with no proxy, a
+        Telegram fallback-IP transport that rewrites the API host to Telegram
+        datacenter IPs). Both are wrong for Bale: ``tapi.bale.ai`` is an Iranian
+        service directly reachable without any proxy, and a proxy hop only adds
+        latency/flakiness (or routes Bale through a VPN the user configured for
+        Telegram only). Scope-forcing the plain direct branch here so Telegram
+        keeps its own proxy route untouched.
+        """
+        import plugins.platforms.telegram.adapter as _tg_mod
+
+        real_resolve = _tg_mod.resolve_proxy_url
+        fallback_env = "HERMES_TELEGRAM_DISABLE_FALLBACK_IPS"
+        prev_fallback = os.environ.get(fallback_env)
+
+        def _always_direct(platform_env_var=None, **kw):
+            return None
+
+        _tg_mod.resolve_proxy_url = _always_direct
+        os.environ[fallback_env] = "1"
+        try:
+            return await super()._build_ptb_requests()
+        finally:
+            _tg_mod.resolve_proxy_url = real_resolve
+            if prev_fallback is None:
+                os.environ.pop(fallback_env, None)
+            else:
+                os.environ[fallback_env] = prev_fallback
+
     async def connect(self, *, is_reconnect: bool = False) -> bool:
         # Parent builds the PTB Application (and the polling loop) here.
         ok = await super().connect(is_reconnect=is_reconnect)
