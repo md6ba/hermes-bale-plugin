@@ -80,7 +80,7 @@ class BaleAdapter(TelegramAdapter):
         # Force the Bale endpoint. PTB appends the token to base_url, so the
         # value must end in "/bot".
         extra["base_url"] = _BALE_API_BASE
-        extra["base_file_url"] = _BALE_API_BASE
+        extra["base_file_url"] = "https://tapi.bale.ai/file/bot"
         try:
             config.extra = extra
         except AttributeError:
@@ -228,7 +228,7 @@ def _apply_yaml_config(yaml_cfg: dict, bale_cfg: dict) -> dict | None:
     """
     extras: dict = {}
     extras["base_url"] = _BALE_API_BASE
-    extras["base_file_url"] = _BALE_API_BASE
+    extras["base_file_url"] = "https://tapi.bale.ai/file/bot"
     tok = _bale_token()
     if tok:
         extras["_bale_token"] = tok
